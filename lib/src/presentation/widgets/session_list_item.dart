@@ -12,10 +12,7 @@ class SessionListItem {
             style: Theme.of(context).textTheme.headline5,
           ),
           const Divider(height: 20),
-          Text(
-            description,
-            style: Theme.of(context).textTheme.headline6,
-          )
+          Text(description)
         ],
       ),
       onPressed: onPressed,

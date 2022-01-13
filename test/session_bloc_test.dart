@@ -37,6 +37,7 @@ void main() {
     bloc.dispose();
 
     expect(interrupted, true);
+    expect(bloc.isActive, false);
   });
 
   test('Test session stop if not started', () async {
