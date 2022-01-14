@@ -3,10 +3,10 @@ import 'package:breath/src/data/repositories/predefined_session_types_repository
 import 'package:breath/src/domain/entities/session_type.dart';
 import 'package:breath/src/presentation/blocs/remove_session_types_bloc.dart';
 import 'package:breath/src/presentation/views/session_add_page.dart';
+import 'package:breath/src/presentation/views/session_briefing_page.dart';
 import 'package:breath/src/presentation/widgets/app_bar.dart';
 import 'package:breath/src/presentation/widgets/session_list_item.dart';
 import 'package:breath/src/presentation/blocs/retrieve_session_types_bloc.dart';
-import 'package:breath/src/presentation/views/session_page.dart';
 
 import 'package:flutter/material.dart';
 
@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           }
           return ListView.separated(
               separatorBuilder: (context, index) => const Divider(
-                color: Colors.black,
+                color: Colors.grey,
               ),
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
@@ -67,13 +67,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             removeBloc.remove(item);
                           });
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('\'${item.name}\' deleted')));
+                              content: Text('Session \'${item.name}\' deleted')));
                       },
-                      child: SessionListItem(item.name, item.description)
+                      child: SessionListItem(item.name, item.shortDescription)
                           .build(context, () => onSessionChosen(context, item)),
                       background: Container(color: Colors.red.shade900));
                 }
-                return SessionListItem(item.name, item.description)
+                return SessionListItem(item.name, item.shortDescription)
                     .build(context, () => onSessionChosen(context, item));
               }
           );
@@ -91,7 +91,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void onSessionChosen(BuildContext context, SessionType session) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SessionPage(sessionType: session)));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SessionBriefingPage(sessionType: session)));
   }
   
   void onSessionAdd(BuildContext context) {

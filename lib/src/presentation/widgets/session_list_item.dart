@@ -11,7 +11,10 @@ class SessionListItem {
             heading,
             style: Theme.of(context).textTheme.headline5,
           ),
-          const Divider(height: 20),
+          const Divider(
+            height: 20,
+            color: Colors.transparent
+          ),
           Text(description)
         ],
       ),

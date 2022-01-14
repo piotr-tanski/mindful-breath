@@ -8,6 +8,7 @@ import 'package:sqflite/sqflite.dart';
 
 Map<String, dynamic> convertToMap(SessionType sessionType) => {
     SessionTable.name: sessionType.name,
+    SessionTable.shortDescription: sessionType.shortDescription,
     SessionTable.description: sessionType.description,
     SessionTable.inhaleDuration: sessionType.parameters.getPhaseDuration(SessionPhase.inhale).inSeconds,
     SessionTable.holdBreathDuration: sessionType.parameters.getPhaseDuration(SessionPhase.holdBreath).inSeconds,
@@ -30,6 +31,7 @@ class SessionTypeDAO implements PersistentSessionType
           holdBreath: Duration(seconds: maps[i][SessionTable.holdBreathDuration]),
           exhale: Duration(seconds: maps[i][SessionTable.exhaleDuration]),
           holdEmptyLungs: Duration(seconds: maps[i][SessionTable.holdEmptyLungsDuration])),
+        shortDescription: maps[i][SessionTable.shortDescription],
         description: maps[i][SessionTable.description],
         id: maps[i][SessionTable.id]
       );

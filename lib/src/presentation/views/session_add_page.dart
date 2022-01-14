@@ -36,7 +36,7 @@ class _SessionAddPageState extends State<SessionAddPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
                 child: TextFormField(
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -51,7 +51,7 @@ class _SessionAddPageState extends State<SessionAddPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
                 child: TextFormField(
                   validator: (value) {
                     description = value ?? "";
@@ -63,7 +63,7 @@ class _SessionAddPageState extends State<SessionAddPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
                 child: TextFormField(
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly
@@ -86,7 +86,7 @@ class _SessionAddPageState extends State<SessionAddPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
                 child: TextFormField(
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly
@@ -107,7 +107,7 @@ class _SessionAddPageState extends State<SessionAddPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
                 child: TextFormField(
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly
@@ -130,7 +130,7 @@ class _SessionAddPageState extends State<SessionAddPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
                 child: TextFormField(
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly
@@ -150,31 +150,31 @@ class _SessionAddPageState extends State<SessionAddPage> {
                   ),
                 ),
               ),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Validate returns true if the form is valid, or false otherwise.
-                    if (_formKey.currentState!.validate()) {
-                      bloc.add(SessionType(
-                          name,
-                          SessionParameters(
-                            inhale: inhale,
-                            holdBreath: holdBreath,
-                            exhale: exhale,
-                            holdEmptyLungs: holdEmptyLungs,
-                          ),
-                          description: description
-                      ));
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: const Text('Save'),
-                ),
-              ),
             ],
           ),
         )
-      )
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.save),
+        backgroundColor: Colors.white,
+        onPressed: () {
+          // Validate returns true if the form is valid, or false otherwise.
+          if (_formKey.currentState!.validate()) {
+            bloc.add(SessionType(
+                name,
+                SessionParameters(
+                  inhale: inhale,
+                  holdBreath: holdBreath,
+                  exhale: exhale,
+                  holdEmptyLungs: holdEmptyLungs,
+                ),
+                shortDescription: description,
+                description: description
+            ));
+            Navigator.pop(context);
+          }
+        },
+      ),
     );
   }
 

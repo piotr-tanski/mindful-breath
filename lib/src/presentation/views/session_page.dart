@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:breath/src/domain/entities/session.dart';
 import 'package:breath/src/domain/entities/session_phase.dart';
 import 'package:breath/src/domain/entities/session_state.dart';
@@ -8,11 +10,6 @@ import 'package:breath/src/presentation/widgets/app_bar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:wakelock/wakelock.dart';
-
-const kCircleMinWidth = 1.0;
-const kCircleMinHeight = 1.0;
-const kCircleMaxWidth = 300.0;
-const kCircleMaxHeight = 300.0;
 
 class SessionPage extends StatefulWidget {
   const SessionPage({Key? key, required this.sessionType}) : super(key: key);
@@ -30,6 +27,7 @@ class _SessionPageState extends State<SessionPage> {
     Wakelock.toggle(enable: false);
     _bloc.stopSession();
     _bloc.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -50,55 +48,75 @@ class _SessionPageState extends State<SessionPage> {
     Wakelock.toggle(enable: true);
   }
 
+  void startCountdownTimer({Duration interval = const Duration(seconds: 1)}) {
+    _timer?.cancel();
+    _timer = Timer.periodic(interval, (timer) {
+      if (_countdown == 1) {
+        timer.cancel();
+      }
+      else {
+        setState(() {
+          --_countdown;
+        });
+      }
+    });
+  }
+
   void _setInhaleState(SessionState state) {
     setState(() {
       _animationDuration = state.duration;
-      _currentWidth = _innerCircleMaxSize(_maxWidth);
-      _currentHeight = _innerCircleMaxSize(_maxHeight);
+      _countdown = state.duration.inSeconds;
+      _currentRadius = _innerCircleMaxRadius(_maxRadius);
       _displayedText = "Breathe in";
     });
+    startCountdownTimer();
   }
 
   void _setHoldBreathState(SessionState state) {
     setState(() {
       _animationDuration = const Duration();
-      _currentWidth = _innerCircleMaxSize(_maxWidth);
-      _currentHeight = _innerCircleMaxSize(_maxHeight);
+      _countdown = state.duration.inSeconds;
+      _currentRadius = _innerCircleMaxRadius(_maxRadius);
       _displayedText = "Hold";
     });
+    startCountdownTimer();
   }
 
-  double _innerCircleMaxSize(double dimension) => dimension - 5.0;
+  double _innerCircleMaxRadius(double dimension) => dimension - 5.0;
 
   void _setExhaleState(SessionState state) {
     setState(() {
       _animationDuration = state.duration;
-      _currentWidth = kCircleMinWidth;
-      _currentHeight = kCircleMinHeight;
+      _countdown = state.duration.inSeconds;
+      _currentRadius = _minRadius;
       _displayedText = "Breathe out";
     });
+    startCountdownTimer();
   }
 
   void _setHoldEmptyLungsState(SessionState state) {
     setState(() {
       _animationDuration = const Duration();
-      _currentWidth = kCircleMinWidth;
-      _currentHeight = kCircleMinHeight;
+      _countdown = state.duration.inSeconds;
+      _currentRadius = _minRadius;
       _displayedText = "Hold";
     });
+    startCountdownTimer();
   }
 
   @override
   Widget build(BuildContext context) {
-    _maxHeight = _maxWidth = _getCircleMaxRadius();
+    if (!_initialized) {
+      _firstInitialization();
+    }
     return Scaffold(
       appBar: createAppBar(title: widget.sessionType.name),
       body: Stack(
         children: <Widget>[
           Center(
               child: Container(
-                  width: _maxWidth,
-                  height: _maxHeight,
+                  width: _maxRadius,
+                  height: _maxRadius,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.black),
@@ -107,8 +125,8 @@ class _SessionPageState extends State<SessionPage> {
           ),
           Center(
               child: AnimatedContainer(
-                width: _currentWidth,
-                height: _currentHeight,
+                width: _currentRadius,
+                height: _currentRadius,
                 duration: _animationDuration,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -116,28 +134,44 @@ class _SessionPageState extends State<SessionPage> {
                   )
               )
           ),
-          Center(
-            child: Text(_displayedText, style: Theme.of(context).textTheme.headline5),
-          )
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Center(child: Text(_displayedText ?? "", style: Theme.of(context).textTheme.headline5)),
+              Center(child: Text("$_countdown", style: Theme.of(context).textTheme.headline5)),
+            ],
+          ),
         ],
       ),
     );
   }
 
+  void _firstInitialization() {
+    _maxRadius = _getCircleMaxRadius();
+    _currentRadius = _minRadius = _getCircleMinRadius();
+    _initialized = true;
+  }
+
   double _getCircleMaxRadius() {
-    const factor = 0.6;
+    const factor = 0.8;
     final base = _isPortraitMode() ? MediaQuery.of(context).size.width : MediaQuery.of(context).size.height;
     return base * factor;
   }
 
+  double _getCircleMinRadius() => _getCircleMaxRadius() * 0.6;
+
   bool _isPortraitMode() => MediaQuery.of(context).size.height > MediaQuery.of(context).size.width;
 
   late SessionBloc _bloc;
+  late double _minRadius;
+  late double _maxRadius;
+  late double _currentRadius;
 
   var _animationDuration = const Duration();
-  var _currentWidth = kCircleMinWidth;
-  var _currentHeight = kCircleMinHeight;
-  var _maxWidth = kCircleMaxWidth;
-  var _maxHeight = kCircleMaxHeight;
-  var _displayedText = "";
+  bool _initialized = false;
+  int _countdown = 0;
+
+  Timer? _timer;
+  String? _displayedText;
 }
