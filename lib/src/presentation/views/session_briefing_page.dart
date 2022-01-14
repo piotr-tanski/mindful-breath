@@ -18,7 +18,7 @@ class _SessionBriefingPageState extends State<SessionBriefingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: createAppBar(title: "Start session"),
+      appBar: createCommonAppBar(title: "Start session"),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: SingleChildScrollView(

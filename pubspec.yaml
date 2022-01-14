@@ -17,8 +17,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   equatable: ^2.0.3
   rxdart: ^0.27.3
+  shared_preferences: ^2.0.12
   sqflite: ^2.0.2
   wakelock: ^0.6.0+1
+  vibration: ^1.7.4-nullsafety.0
 
 dev_dependencies:
   flutter_test:

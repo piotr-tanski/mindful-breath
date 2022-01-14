@@ -28,7 +28,7 @@ class _SessionAddPageState extends State<SessionAddPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: createAppBar(title: widget.title),
+      appBar: createCommonAppBar(title: widget.title),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(

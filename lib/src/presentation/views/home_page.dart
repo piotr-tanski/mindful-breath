@@ -4,6 +4,7 @@ import 'package:breath/src/domain/entities/session_type.dart';
 import 'package:breath/src/presentation/blocs/remove_session_types_bloc.dart';
 import 'package:breath/src/presentation/views/session_add_page.dart';
 import 'package:breath/src/presentation/views/session_briefing_page.dart';
+import 'package:breath/src/presentation/views/settings_page.dart';
 import 'package:breath/src/presentation/widgets/app_bar.dart';
 import 'package:breath/src/presentation/widgets/session_list_item.dart';
 import 'package:breath/src/presentation/blocs/retrieve_session_types_bloc.dart';
@@ -31,7 +32,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: createAppBar(title: widget.title),
+      appBar: createHomePageAppBar(title: widget.title, onClicked: onSettingsClicked),
       body: FutureBuilder(
         future: retrieveBloc.getSessionTypes(),
         initialData: const <SessionType>[],
@@ -70,11 +71,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               content: Text('Session \'${item.name}\' deleted')));
                       },
                       child: SessionListItem(item.name, item.shortDescription)
-                          .build(context, () => onSessionChosen(context, item)),
+                          .build(context, () => onSessionChosen(item)),
                       background: Container(color: Colors.red.shade900));
                 }
                 return SessionListItem(item.name, item.shortDescription)
-                    .build(context, () => onSessionChosen(context, item));
+                    .build(context, () => onSessionChosen(item));
               }
           );
         },
@@ -83,18 +84,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         backgroundColor: Colors.white,
-        onPressed: () {
-          onSessionAdd(context);
-        },
+        onPressed: onSessionAdd,
       ),
     );
   }
 
-  void onSessionChosen(BuildContext context, SessionType session) {
+  void onSettingsClicked() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()));
+  }
+
+  void onSessionChosen(SessionType session) {
     Navigator.push(context, MaterialPageRoute(builder: (context) => SessionBriefingPage(sessionType: session)));
   }
   
-  void onSessionAdd(BuildContext context) {
+  void onSessionAdd() {
     Navigator.push(context, MaterialPageRoute(builder: (context) => SessionAddPage(title: "Add session", repository: _customSessionTypesRepository))).then((value) {
       setState(() { });
     });

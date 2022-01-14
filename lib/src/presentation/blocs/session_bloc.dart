@@ -1,12 +1,13 @@
 import 'package:breath/src/domain/entities/session.dart';
 import 'package:breath/src/domain/entities/session_state.dart';
+import 'package:breath/src/domain/services/next_phase_notifier.dart';
 import 'package:breath/src/domain/use_cases/next_session_phase.dart';
 
 import 'package:rxdart/rxdart.dart';
 import 'package:async/async.dart';
 
 class SessionBloc {
-  SessionBloc(this._session, this._soundNotifier);
+  SessionBloc(this._session, this._notifier);
 
   Stream<SessionState> get states => _sessionStateSubject.stream;
   bool get isActive => _isSessionActive;
@@ -17,7 +18,7 @@ class SessionBloc {
   }
 
   Future<void> _loop() async {
-    final nextPhase = NextSessionPhaseUseCase(_session, _soundNotifier);
+    final nextPhase = NextSessionPhaseUseCase(_session, _notifier);
     while (_isSessionActive) {
       _sessionStateSubject.add(await nextPhase());
       await _waitForNextPhase();
@@ -40,7 +41,7 @@ class SessionBloc {
   }
 
   final Session _session;
-  final SoundNotifier _soundNotifier;
+  final NextPhaseNotifier _notifier;
   final _sessionStateSubject = PublishSubject<SessionState>();
 
   CancelableOperation? _op;

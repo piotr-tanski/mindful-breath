@@ -1,11 +1,12 @@
 import 'dart:async';
 
+import 'package:breath/src/data/settings/application_settings.dart';
 import 'package:breath/src/domain/entities/session.dart';
 import 'package:breath/src/domain/entities/session_phase.dart';
 import 'package:breath/src/domain/entities/session_state.dart';
 import 'package:breath/src/domain/entities/session_type.dart';
 import 'package:breath/src/presentation/blocs/session_bloc.dart';
-import 'package:breath/src/data/models/sound_notifier_impl.dart';
+import 'package:breath/src/data/services/phase_notifier_impl.dart';
 import 'package:breath/src/presentation/widgets/app_bar.dart';
 
 import 'package:flutter/material.dart';
@@ -34,18 +35,20 @@ class _SessionPageState extends State<SessionPage> {
   @override
   void initState() {
     super.initState();
-    _bloc = SessionBloc(Session(widget.sessionType), SoundNotifierImpl());
-    _bloc.states.listen((newState) {
-      switch (newState.phase) {
-        case SessionPhase.inhale: _setInhaleState(newState); break;
-        case SessionPhase.holdBreath: _setHoldBreathState(newState); break;
-        case SessionPhase.exhale: _setExhaleState(newState); break;
-        case SessionPhase.holdEmptyLungs: _setHoldEmptyLungsState(newState); break;
-        case SessionPhase.inactive: break;
-      }
+    _settings.enabledNotifications.then((value) {
+      _bloc = SessionBloc(Session(widget.sessionType), NotifierFactory.create(value));
+      _bloc.states.listen((newState) {
+        switch (newState.phase) {
+          case SessionPhase.inhale: _setInhaleState(newState); break;
+          case SessionPhase.holdBreath: _setHoldBreathState(newState); break;
+          case SessionPhase.exhale: _setExhaleState(newState); break;
+          case SessionPhase.holdEmptyLungs: _setHoldEmptyLungsState(newState); break;
+          case SessionPhase.inactive: break;
+        }
+      });
+      _bloc.startSession();
+      Wakelock.toggle(enable: true);
     });
-    _bloc.startSession();
-    Wakelock.toggle(enable: true);
   }
 
   void startCountdownTimer({Duration interval = const Duration(seconds: 1)}) {
@@ -110,7 +113,7 @@ class _SessionPageState extends State<SessionPage> {
       _firstInitialization();
     }
     return Scaffold(
-      appBar: createAppBar(title: widget.sessionType.name),
+      appBar: createCommonAppBar(title: widget.sessionType.name),
       body: Stack(
         children: <Widget>[
           Center(
@@ -159,9 +162,11 @@ class _SessionPageState extends State<SessionPage> {
     return base * factor;
   }
 
-  double _getCircleMinRadius() => _getCircleMaxRadius() * 0.6;
+  double _getCircleMinRadius() => _getCircleMaxRadius() * 0.5;
 
   bool _isPortraitMode() => MediaQuery.of(context).size.height > MediaQuery.of(context).size.width;
+
+  final _settings = PersistentSettings();
 
   late SessionBloc _bloc;
   late double _minRadius;
